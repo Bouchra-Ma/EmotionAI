@@ -24,7 +24,7 @@ for msg in messages:
     result = results[0]        # <= on prend le premier dict de la liste
     doc = {
         "texte": msg,
-        "emotion": result['label'],
+       "emotion": result[0]['label'],
         "score": result['score'],
         "date_insertion": datetime.utcnow(),
     }
