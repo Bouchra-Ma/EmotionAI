@@ -2,7 +2,7 @@ from transformers import pipeline
 from datetime import datetime
 from pymongo import MongoClient
 from collections import Counter
-
+import matplotlib.pyplot as plt
 
 # Initialisation du modèle
 classifier = pipeline(
@@ -52,3 +52,29 @@ counter = Counter(emotions)
 print("\n📊 Résumé des émotions détectées :")
 for emotion, count in counter.items():
     print(f"{emotion} : {count}")
+
+
+
+# Création du graphique
+emotions = [doc["emotion"] for doc in collection.find()]
+counter = Counter(emotions)
+
+# Données pour le graphique
+labels = list(counter.keys())
+values = list(counter.values())
+
+# Configuration du graphique
+plt.figure(figsize=(10, 6))
+bars = plt.bar(labels, values, color='skyblue', edgecolor='black')
+plt.title("Distribution of Detected Emotions")
+plt.xlabel("Emotions")
+plt.ylabel("Frequency")
+plt.xticks(rotation=45)
+plt.tight_layout()
+
+# Affichage
+for bar in bars:
+    yval = bar.get_height()
+    plt.text(bar.get_x() + bar.get_width()/2.0, yval + 0.2, int(yval), ha='center', va='bottom')
+
+plt.show()
