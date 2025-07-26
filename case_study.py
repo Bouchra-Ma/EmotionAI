@@ -53,7 +53,13 @@ print("\n📊 Résumé des émotions détectées :")
 for emotion, count in counter.items():
     print(f"{emotion} : {count}")
 
+summary_doc = {
+    "date_analyse": datetime.now(),
+    "summary": dict(counter)
+}
 
+db["emotions_summary"].insert_one(summary_doc)
+print("Résumé des émotions sauvegardé dans la base !")
 
 # Création du graphique
 emotions = [doc["emotion"] for doc in collection.find()]
