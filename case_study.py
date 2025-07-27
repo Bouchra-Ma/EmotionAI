@@ -3,6 +3,10 @@ from datetime import datetime
 from pymongo import MongoClient
 from collections import Counter
 import matplotlib.pyplot as plt
+import time
+
+# ⏱ Début du chrono
+start_time = time.time()
 
 # Initialisation du modèle
 classifier = pipeline(
@@ -15,6 +19,10 @@ classifier = pipeline(
 client = MongoClient("mongodb://localhost:27017/")
 db = client["emotions_db"]
 collection = db["goemotions_case_study"]
+
+# 🔥 Nettoyage des anciennes données AVANT insertion
+collection.delete_many({})
+db["emotions_summary"].delete_many({})
 
 # Messages simulés
 messages = [
@@ -45,16 +53,23 @@ for message in messages:
 
 print("✅ Étude de cas enregistrée dans MongoDB !")
 
-# Résumé statistique des émotions
 emotions = [doc["emotion"] for doc in collection.find()]
 counter = Counter(emotions)
 
+# Résumé console
 print("\n📊 Résumé des émotions détectées :")
 for emotion, count in counter.items():
     print(f"{emotion} : {count}")
 
+
+
+execution_time = round(time.time() - start_time, 2)
+
 summary_doc = {
     "date_analyse": datetime.now(),
+    "model_used": "joeddav/distilbert-base-uncased-go-emotions-student",
+    "message_count": len(messages),
+    "execution_time_seconds": execution_time,
     "summary": dict(counter)
 }
 
@@ -84,3 +99,4 @@ for bar in bars:
     plt.text(bar.get_x() + bar.get_width()/2.0, yval + 0.2, int(yval), ha='center', va='bottom')
 
 plt.show()
+
